@@ -1,0 +1,19 @@
+apiVersion: skaffold/v2beta12
+kind: Config
+build:
+  artifacts:
+    - image: express-service
+      context: .
+    - image: express-scheduler
+      context: .
+    - image: express-worker
+      context: .
+  tagPolicy:
+    gitCommit: { }
+  local:
+    useBuildkit: false
+deploy:
+  kubectl:
+    manifests:
+      - ./.k8s/**.yaml
+    defaultNamespace: logistics

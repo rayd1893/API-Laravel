@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: express-scheduler
+spec:
+  replicas: 1
+  minReadySeconds: 20
+  selector:
+    matchLabels:
+      app: express-scheduler
+  template:
+    metadata:
+      labels:
+        app: express-scheduler
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+        - name: scheduler
+          image: express-scheduler
+          env:
+            - name: CONTAINER_ROLE
+              value: "scheduler"
+          envFrom:
+            - configMapRef:
+                name: express-config
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 250m
+            limits:
+              memory: 512Mi
+              cpu: 500m

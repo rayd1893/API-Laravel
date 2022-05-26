@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: express-service
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: express-service
+  template:
+    metadata:
+      labels:
+        app: express-service
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+        - name: server
+          image: express-service
+          ports:
+            - name: http
+              containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: express-config
+          readinessProbe:
+            httpGet:
+              path: /api/healthz
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 55
+          livenessProbe:
+            httpGet:
+              path: /api/healthz
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 55
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 250m
+            limits:
+              memory: 512Mi
+              cpu: 500m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: express-service
+spec:
+  type: ClusterIP
+  selector:
+    app: express-service
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http

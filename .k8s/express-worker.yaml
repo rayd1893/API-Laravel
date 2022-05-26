@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: express-worker
+spec:
+  replicas: 4
+  minReadySeconds: 20
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: express-worker
+  template:
+    metadata:
+      labels:
+        app: express-worker
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+        - name: worker
+          image: express-worker
+          env:
+            - name: CONTAINER_ROLE
+              value: "worker"
+          envFrom:
+            - configMapRef:
+                name: express-config
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 250m
+            limits:
+              memory: 512Mi
+              cpu: 500m
+

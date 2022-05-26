@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: express-ingress
+spec:
+  hosts:
+    - "express.x.99minutos.tech"
+  gateways:
+    - istio-system/gateway
+  http:
+    - route:
+        - destination:
+            host: express-service
+            port:
+              number: 8080
